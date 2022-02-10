@@ -52,7 +52,7 @@ pub enum FuturesWebsocketEvent {
     OrderTrade(model::OrderTradeEvent),
     AggrTrades(AggrTradesEvent),
     Trade(TradeEvent),
-    OrderBook(OrderBook),
+    OrderBook(DepthOrderBookEvent),
     DayTicker(DayTickerEvent),
     MiniTicker(MiniTickerEvent),
     MiniTickerAll(Vec<MiniTickerEvent>),
@@ -84,15 +84,15 @@ enum FuturesEvents {
     AccountUpdateEvent(AccountUpdateEvent),
     OrderTradeEvent(model::OrderTradeEvent),
     AggrTradesEvent(AggrTradesEvent),
-    IndexPriceEvent(IndexPriceEvent),
     MarkPriceEvent(MarkPriceEvent),
+    IndexPriceEvent(IndexPriceEvent),
     VecMarkPriceEvent(Vec<MarkPriceEvent>),
     TradeEvent(TradeEvent),
     KlineEvent(KlineEvent),
     ContinuousKlineEvent(ContinuousKlineEvent),
     IndexKlineEvent(IndexKlineEvent),
     LiquidationEvent(LiquidationEvent),
-    OrderBook(OrderBook),
+    OrderBook(DepthOrderBookEvent),
     DepthOrderBookEvent(DepthOrderBookEvent),
 }
 
@@ -198,5 +198,18 @@ impl<'a> FuturesWebSockets<'a> {
             }
         }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests{
+    use crate::futures::websockets::FuturesEvents;
+
+    #[test]
+    fn test_der(){
+        let msg = r#"{"E":1644488187000,"P":"44458.55318889","T":1644508800000,"e":"markPriceUpdate","i":"44565.38848754","p":"44547.02000000","r":"-0.00004803","s":"BTCUSDT"}"#;
+        let value: serde_json::Value = serde_json::from_str(msg).unwrap();
+        let event = serde_json::from_value::<FuturesEvents>(value).unwrap();
+        println!("{:?}", event);
     }
 }
